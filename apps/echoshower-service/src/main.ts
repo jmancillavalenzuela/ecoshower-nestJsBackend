@@ -2,20 +2,22 @@
  * This is not a production server yet!
  * This is only a minimal backend to get started.
  */
-
-import { Logger } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
-
-import { AppModule } from './app/app.module';
+ import { NestFactory } from '@nestjs/core';
+ import { PubSubServer } from 'nestjs-google-pubsub';
+ import { AppModule } from './app/app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const globalPrefix = 'api';
-  app.setGlobalPrefix(globalPrefix);
-  const port = process.env.PORT || 3333;
-  await app.listen(port, () => {
-    Logger.log('Listening at http://localhost:' + port + '/' + globalPrefix);
+  const app = await NestFactory.createMicroservice(AppModule, {
+    strategy: new PubSubServer({
+      projectId: 'feisty-mechanic-310318',
+      topics: {
+        'iotcore-topic': {
+          subscriptionId: 'iotcore-subscription'
+        }
+      }
+    })
   });
+  app.listen(() => console.log('Microservice is listening'));
 }
 
 bootstrap();

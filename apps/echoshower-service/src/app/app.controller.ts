@@ -1,13 +1,12 @@
-import { Controller, Get } from '@nestjs/common';
-
+import { EventPattern } from '@nestjs/microservices';
 import { AppService } from './app.service';
+import { Message } from '@google-cloud/pubsub';
 
-@Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
+  constructor() {}
 
-  @Get()
-  getData() {
-    return this.appService.getData();
+  @EventPattern('iotcore-topic')
+  async handleMyTopicEvent(data: Message) {
+    console.log(data.data.toString());
   }
 }
